@@ -2,7 +2,8 @@
 
 This folder is the repository root. Initialize Git here, review the files, and
 push it to the GitHub repository you choose. No remote or author identity is
-preconfigured, and no commit or upload is made automatically.
+preconfigured. Committing and pushing remain manual; pushing a version tag
+publishes a release automatically after the public checks pass.
 
 From this folder, a typical first publication starts with:
 
@@ -17,8 +18,36 @@ git commit -m "Initial public patches, source and tests"
 Then add the GitHub remote you own and push. Review the staged files before the
 commit; initialize in this clean repository folder, not a parent workspace.
 
-Most players need only the two BPS downloads. Keep those links prominent in the
-README, and attach a small patch-only ZIP to GitHub Releases:
+## Automatic GitHub releases
+
+Commit and push the current repository, then tag that exact commit and push the
+tag. For example, from a clean working tree:
+
+```sh
+git tag -a v0.1.0 -m "Oracle 100 Percent v0.1.0"
+git push origin v0.1.0
+```
+
+The workflow runs the public checks on branch/tag pushes and pull requests.
+Only a pushed tag beginning with `v` publishes a release, and only after those
+checks pass. The release contains both individual BPS patches, the player ZIP,
+SHA256SUMS and the manifest. The ZIP includes its own player README. Release
+notes also link to the tagged version's player guide.
+
+Tags containing a hyphen, such as `v0.1.0-beta.1`, publish as prereleases.
+Ordinary branch pushes and pull requests do not publish. The workflow uses
+GitHub's built-in token; no personal access token is required. Only the release
+job receives `contents: write` permission. Repository or organization policies
+must permit that permission and GitHub Actions.
+
+Use a new tag for each release. Rerunning an already-published tag does not
+overwrite its release or assets; release creation will fail because it exists.
+The workflow packages the committed patches and does not build ROMs or run the
+ROM-dependent emulator suite. Complete local gameplay validation before tagging.
+
+## Manual packaging
+
+To make the player ZIP locally instead:
 
 ```sh
 python -B tools/check_public_tree.py
@@ -32,8 +61,8 @@ notice. `dist/` is ignored; the generated player ZIP need not be committed.
 The archive tool refuses to overwrite a previous release ZIP.
 
 The public repository keeps `patches/*.bps` committed so visitors can download
-without a release page. The initial CHANGELOG entry is Unreleased; choose the
-first tag/version when you publish. Do not label the export as a fully tested
+without a release page. Choose a new tag/version when you publish and update the
+changelog for that release. Do not label the export as a fully tested
 end-to-end 100% playthrough.
 
 ## What belongs in Git

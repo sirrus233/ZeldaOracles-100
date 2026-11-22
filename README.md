@@ -15,6 +15,10 @@ See **[patching instructions and required ROM hashes](docs/PLAYING.md)**.
 Players do not need Python, the disassembly, PyBoy or a build toolchain if using
 a BPS-compatible patcher.
 
+GitHub Releases provide both individual patches and a player ZIP with instructions.
+Maintainers publish these automatically by pushing a `v` version tag after local
+validation; see [release instructions](docs/RELEASING.md).
+
 ## What changes
 
 - A postgame heart-container chest in Game 1 provides its otherwise missing heart.
