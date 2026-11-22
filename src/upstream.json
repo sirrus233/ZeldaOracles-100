@@ -1,0 +1,247 @@
+{
+  "repository": "https://github.com/Stewmath/oracles-disasm",
+  "commit": "21c924afdc8a13225e849214479d5113da2ec226",
+  "archive_url": "https://github.com/Stewmath/oracles-disasm/archive/21c924afdc8a13225e849214479d5113da2ec226.zip",
+  "changed_files": {
+    "ages.s": {
+      "before_sha256": "0e857966f82705246265cc702bfa6c39a8b3dcf25a28c41630ad1f3845558251",
+      "after_sha256": "38ddcb9c2b56205c7fa43cf03f4e5a9cfcf6ec95906f74bfb75266a5c8a08748"
+    },
+    "code/ages/cutscenes/bank10.s": {
+      "before_sha256": "90e283801e8a98c52bb6cb7f3113e464f908deeded44715e0c9bfaefaffa4d26",
+      "after_sha256": "5d46f67ab8fb2b8474dc300aedf8f49cb29717da4db3c1bcbc6f2d9683005cbc"
+    },
+    "code/ages/roomGfxChanges.s": {
+      "before_sha256": "160efb20c4f76c566464146824cfe6ea6ce74a6a57de3f3dbad1064e6256578d",
+      "after_sha256": "d16c44fd1ca0c24b10c1f4a770dac0f316698f280a16a067f43c237388f9e9e2"
+    },
+    "code/ages/roomSpecificCode.s": {
+      "before_sha256": "756811917cfb79460bda1bd7236a937f54d556a9606159982372bf383bb4b48d",
+      "after_sha256": "48e1ed3fc7ad5a2fa04d05ce012acaba1850ef14dfbf421c9cdd5e7596ebae0b"
+    },
+    "code/bank0.s": {
+      "before_sha256": "a77fe526e827a8438efd74796074eccd1c5983304993d543a8a1f260f6260308",
+      "after_sha256": "90efc95d4e9d141bf75c5c3cd87f5871b4522c932e66f5171e006781a2b6d22c"
+    },
+    "code/bank2.s": {
+      "before_sha256": "7555025d1e91489b58310d882af6d044583d540d6eedea95f7e9299b124893e2",
+      "after_sha256": "19a430ff2ac541eaae590d4a9e669bad29866f57f661570e17f94e4ca5029708"
+    },
+    "code/bank4.s": {
+      "before_sha256": "fdb5cb26440774e4d9bbdcf6658601b88f1ddb47e3c807a3b2c30b0539837caf",
+      "after_sha256": "d3cb0abfc80dbca3ee20f234095148a3c3a0ecffbe0ca747d40fddd736da1242"
+    },
+    "code/commonTileSubstitutions.s": {
+      "before_sha256": "a84c6fa944b8d6c4dfd0b2980845e82c4eca7f28db59fb80c0443f66ce67a5af",
+      "after_sha256": "b0044ea1b0ae90f18135be671806ea5c2f4e88f145f6c68141e3f9f18dba3651"
+    },
+    "code/fileManagement.s": {
+      "before_sha256": "e7dc41c747d84c96ff0a24b8013ec0d179e7e46a6d8ee31224595c7fee336988",
+      "after_sha256": "a73c368d63b384201f69a267490cc2cc92cf4bd94359f4f169608b102a6be2c3"
+    },
+    "code/interactableTiles.s": {
+      "before_sha256": "8e0b13bca7fe60a949c061aaf715e1cbd6d3918c699b152c34c19868cf72547d",
+      "after_sha256": "ad0fbc54a7e3f7d7de66638a94382bdc222071ca262fb2af6f71739a6a9e9dd7"
+    },
+    "code/seasons/cutscenes/endgameCutscenes.s": {
+      "before_sha256": "dd0849d77227f41cb3919b0a7508224ac9b4ce8395ab318e61f72cd34ccdc85f",
+      "after_sha256": "7b08828bf3dc2e5a8d153eba76b34b451b61f255399ef3d583318edff6be79c2"
+    },
+    "code/seasons/roomSpecificTileChanges.s": {
+      "before_sha256": "af8d650965021b5131f30baca0dd25c40c902dbed9b7f3f7c94c45265905170b",
+      "after_sha256": "3af6c6fa82fa4c23bdff4a6184ebbab739022a3d8f5a0a7470a5c00578ab7b2f"
+    },
+    "constants/common/globalFlags.s": {
+      "before_sha256": "0adc42ac810c408120fd5d6725ebf7426b5a0e7c84543c09f75873ab81286c12",
+      "after_sha256": "aa0b5da760c4efa5fba8fa1b1e7b2cd50db9e1541cfb720bda0f0253824aa377"
+    },
+    "constants/common/interactions.s": {
+      "before_sha256": "ee727f788e7d8bae53f014db782ab392dba6dff77bbf78fbaf74b9c91b481384",
+      "after_sha256": "b467e155225e560c517fdb8bd46b2c8b6cf621e868df137cc925a0ae376aa4e5"
+    },
+    "data/ages/chestData.s": {
+      "before_sha256": "f439917fec4d6573ccf4d753a480bc92840fda551567160ceececa45dfd984da",
+      "after_sha256": "c8959a4cfd9bb66628841164fe6a08f8d240f199440b283bc12163b007663df2"
+    },
+    "data/ages/singleTileChanges.s": {
+      "before_sha256": "bc5afdd8448abc34e642a64788d6858be2c9ce9bbe736aea0cc8a9b95e11efc4",
+      "after_sha256": "a2e12451822e6c01b0dcc4875a98730f1cc67c024779a5932937bbb0dac0d361"
+    },
+    "data/seasons/chestData.s": {
+      "before_sha256": "bcc23b26f0da1f40f6aead759c9b3cd2eccf41931f97cc3a4b7bef2fd605b730",
+      "after_sha256": "5255996918d5d328f68c458cb243b7428f377f235dfcf4c2ccb1ff10cc354a4a"
+    },
+    "data/seasons/tile_properties/interactableTiles.s": {
+      "before_sha256": "74045b23010b91b0e2e25e89df26b919b502c7852b08c2770e252e6e7b6adaee",
+      "after_sha256": "a68105d06c634564c42e788b75e4224f196ca63a3fb8d84a2b8c42663b69af44"
+    },
+    "data/seasons/warpSources.s": {
+      "before_sha256": "e319e4e5b93eb01d30eed7fc59708812640eb60caaa20a862d2f3acde57ea9df",
+      "after_sha256": "9df10e597c77477931d2cd97526dc0267527378bd49bff350455c77c0a95717f"
+    },
+    "include/script_commands.s": {
+      "before_sha256": "2b1c77981a7303e844d38a667c849506ceac4df425e91e90b83ff1e658a703e5",
+      "after_sha256": "c86ca30e101c7667fff5e8f3c3f714270a47144ea1facb3e7d0bdc1f36c73267"
+    },
+    "object_code/ages/interactions/adlar.s": {
+      "before_sha256": "a755eb02c57dac66833fc45aa36f8ee30b635dfbf6f389d5627f99912fa4acc4",
+      "after_sha256": "bd0e8d9ee70fa25af5d3a99eff1189f9e9dff0af0fc89b2f656275be0c741658"
+    },
+    "object_code/ages/interactions/ambi.s": {
+      "before_sha256": "eef2796cb6c95c657f53ce8c62161f15e324e9539959346a72d9165dc13f623f",
+      "after_sha256": "f284687a5b583551c488d85efcb8a5d902fd79ec2d993ce8a3b6d22583a1e2f8"
+    },
+    "object_code/ages/interactions/bear.s": {
+      "before_sha256": "07d839d23644830c97f1ee54dfa84d7c6509ccf34bd46ac51b5f0385353afb33",
+      "after_sha256": "bbb161d4a70919aea78273aac767979567616f2d97bf53a107ce25e5670a38e6"
+    },
+    "object_code/ages/interactions/boy.s": {
+      "before_sha256": "db8a1a4f5666185e6447e765f37161ad3d73f4b51808775a38e397cd30a8f3e5",
+      "after_sha256": "ce38cca86b8b714fefec62fe5354021d06c66c7a83e60c0299175d512d2bed3e"
+    },
+    "object_code/ages/interactions/boy2.s": {
+      "before_sha256": "fcd2ab3cad534b140bd32fa9e614eafd7cbb9fc3a13f83b9ff83b9c2c5dc073f",
+      "after_sha256": "96d6007790022308c211987c20ff91b9a3f44378a27958d5d28ce2a64be06d15"
+    },
+    "object_code/ages/interactions/forestFairy.s": {
+      "before_sha256": "cb5e194dc191914068385aa74a138e713abfd0ed84e6b2cae981d4047cd6d510",
+      "after_sha256": "6863d2613a854b8a3e4d3016c76690f16008e30c73abddaed3cf77b3236bf177"
+    },
+    "object_code/ages/interactions/impaNpc.s": {
+      "before_sha256": "71101a2e93c92de50523a4613a95c04dc7b81afcfa16d2ae58a7895bd6d827dc",
+      "after_sha256": "e251a19741ebb3e4a72bd26a979c83a21a49303744e7d0e45ff8f64f8d6d8111"
+    },
+    "object_code/ages/interactions/makuSprout.s": {
+      "before_sha256": "de95fbc0fd2b6c749ce43efbfaf7d814bdcb33bfccdc8de1fc7ebecd7278a33f",
+      "after_sha256": "bd41105698005592405ca1959fc0b9c87eba7455a4729ab814058e8c07ea4743"
+    },
+    "object_code/ages/interactions/makuTree.s": {
+      "before_sha256": "2bb31f60beac15e20e1ded1866e39f36aead50f90d359d590ba4a525a4c84985",
+      "after_sha256": "a638a52f737c9933d2d4d34670d74cd1c84df249c4b028faa36eebe2f4cf8662"
+    },
+    "object_code/ages/interactions/miscMan.s": {
+      "before_sha256": "524c4322a8c8ab1c463217ff6344935d1aed9264460f0fb9218a2b08a2421438",
+      "after_sha256": "edcdb2c15a7123d975b66961b428960cbcc6e33d8470432219bc7a9995c8c545"
+    },
+    "object_code/ages/interactions/miscMan2.s": {
+      "before_sha256": "f7abf2e0b832cf459996be12ad59c30abf5e5e070dfdfa9eee72093f858a03db",
+      "after_sha256": "a274d7983eca3bbe4274ffdb7d675358c2c33f639c98f5434a5ab96798da65a2"
+    },
+    "object_code/ages/interactions/miscellaneous1.s": {
+      "before_sha256": "40964e5983dd518233d3b39d62b76bf634301b19f6328dbde908007018688e09",
+      "after_sha256": "b9d331ccc9e40800c2cee02c9f63ddd70ed11620b7a49a5e79710cbf1391345c"
+    },
+    "object_code/ages/interactions/monkeyMain.s": {
+      "before_sha256": "de2ffa55d3f8b0ded1778021bd9cfcde1267a434ee8baa118e69186d2eba246c",
+      "after_sha256": "1e4cccb6671cc7ee2817f1f274cb77d61094efcba8073f557ccd78cdddb390c3"
+    },
+    "object_code/ages/interactions/mustacheMan.s": {
+      "before_sha256": "951f68420d117214c009d0a5e670d9be127bcaaa7c64ce858c4abdeaa000c0c2",
+      "after_sha256": "e6bb02d7461bd0bf0a5895af92effa3abddfa8c05e5650cda2975054e5665bd5"
+    },
+    "object_code/ages/interactions/nayru.s": {
+      "before_sha256": "f0d9b38a689e9c2248d9de2d94653986a002c0e66bd4302101762bf35d6adad9",
+      "after_sha256": "c593dd88fd266de39e9123c9feb70925b411d0df2a65bc46075fe0510ca3fda3"
+    },
+    "object_code/ages/interactions/pastGuy.s": {
+      "before_sha256": "d8e831f7b48d2cc6d648f0b4313a70de338605673caa00e803f0dc2c33abe991",
+      "after_sha256": "94164497dba46b19e29c3d949d72f65fc4867efd2a7a581d7e0ff2ce6d756c5c"
+    },
+    "object_code/ages/interactions/pastOldLady.s": {
+      "before_sha256": "4e652598eb1448ce68b532068307fa2ae7c289c35f5f8d991b8ce937ffbe8764",
+      "after_sha256": "9e72ef38f864f52b6e27f62b207be59d740db1700c55808a760506d3093aed27"
+    },
+    "object_code/ages/interactions/rabbitMain.s": {
+      "before_sha256": "a263b049e15b5b9fc525c5619f1f23ad23c6c47dc78ba662e48f7731819baf47",
+      "after_sha256": "3b976e5add501eb2a1553c3de10ec085516f90b663b0cdf2e1e750430b142e8b"
+    },
+    "object_code/ages/interactions/ralph.s": {
+      "before_sha256": "8dcb549d211c5ac5eb2afbff31f00d233dc7fc2c93aa61fdc0af4cb5c3f1fc19",
+      "after_sha256": "bed50cd891bfa11d07d4f70037ce1b3f86712b40118fc25a519dd3eb3d88ee3f"
+    },
+    "object_code/ages/interactions/soldier.s": {
+      "before_sha256": "ce179f9697eb88e0c50d0261c85decedfc69ab5ebb07bfe8b0a4d48763193f21",
+      "after_sha256": "c050e78226d0484280c71cde5f37819266660084e11db0e692fea5a34ca7bdeb"
+    },
+    "object_code/common/interactions/dungeonStuff.s": {
+      "before_sha256": "bebc52c0dab8d2d3f7fb50d941ecbb28bc9f08879ef17962d63623ff8dcc2357",
+      "after_sha256": "b3c8d967ba5464f1533e18f8405ce99c34491694570436280f9e3fcd9c708c64"
+    },
+    "object_code/common/interactions/gameCompleteDialog.s": {
+      "before_sha256": "03d19552de6bc285072beefd595d9ed59648f0a11040acc542f51021284aeb02",
+      "after_sha256": "588eae2a058fc7a471d4e34ff4febe1fb0bb03cf10e0b0ea61a9fc52bfbd045a"
+    },
+    "object_code/seasons/interactions/din.s": {
+      "before_sha256": "1f8e9801e6a6ac24f781bb2f93dcf9e091b0ca191392538f997f1ccf340afcca",
+      "after_sha256": "eb9d000be9ea35551d764a9da4642a48dd34b47b1cbf61e87a6d56afd5a59d4d"
+    },
+    "object_code/seasons/interactions/dinDancingEvent.s": {
+      "before_sha256": "247555d6ba3ed7beac2d5c8a19a07a922329035b0c66f781e8d57191b0a54d0d",
+      "after_sha256": "0a8b4e47b19101b629dd2ee412c704b045abf999b53cb482c5e13f54cdbf5704"
+    },
+    "object_code/seasons/interactions/impa.s": {
+      "before_sha256": "bc0bcffda3cfe9c40827f5681fb5391db076b98c52c5504c983f6cdfa4af4796",
+      "after_sha256": "b1c600dcda0466c1174d3eadd000c4845101669ca738594a38306f6d7282ecc1"
+    },
+    "object_code/seasons/interactions/linkedMasterDiver.s": {
+      "before_sha256": "77f0d58c331148ac37b6e95ed536bf43383c18e85a6a53644728da0611507865",
+      "after_sha256": "967284c3d3be494115427ed0bf51bd2b93cc192c268cee516b64179b65ac96bf"
+    },
+    "object_code/seasons/interactions/loneZora.s": {
+      "before_sha256": "8d3e27a396a6caeb65f20514a03ed72873c94e34c8460748ba9150a8ba52924d",
+      "after_sha256": "5799a5eb3c622d741f49d786070ac92ab17a46a86026accbae703fd474cfbaf5"
+    },
+    "object_code/seasons/interactions/makuTree.s": {
+      "before_sha256": "d809999380406f752601b32819ac95e84c62c6e898b6696d21a54dd3aa2dfa84",
+      "after_sha256": "249954b92831bac051b6a9d2e168a10dd9fd7a6bcd9750678ad7be1d814290ee"
+    },
+    "object_code/seasons/interactions/miscNpcs.s": {
+      "before_sha256": "972f35cf2ac67276af08c48d50ff335a0fcd5daf987ec9dced645af5b4e81379",
+      "after_sha256": "8082a8a6eca56e6e21aa3466ea399789e58792dc9a13d2faca445c591182e4dc"
+    },
+    "object_code/seasons/interactions/portalSpawner.s": {
+      "before_sha256": "494ab05e30b6fff0b5395e45684e086f86ee9e1a6812c8c6b9168b098d387cab",
+      "after_sha256": "7ede8ef11b33a6f2b34df6d78c2df48c604b29f70b9f65d127855821c4b6d63b"
+    },
+    "object_code/seasons/interactions/sokra.s": {
+      "before_sha256": "bf9d242129fc7805bb3c75b8eb014153158fade42303107f0c1e57cf52b5ad13",
+      "after_sha256": "83b5950af68bbc826897b503635a526273b7d14071048c94d8cde22ba2f69561"
+    },
+    "object_code/seasons/interactions/sunkenCityBullies.s": {
+      "before_sha256": "a8333e649a708d8d0b72f9a431ab486300aaa82d317089d99ebba6f232c96bea",
+      "after_sha256": "f5453034db7a1ad8b53ae2c6cdb2712d19b644f98514c23aa81351e6d243b0b7"
+    },
+    "scripts/ages/scriptHelper.s": {
+      "before_sha256": "a0ff4f6894cd1ca6f4862cf262527fe4732bde427c3e38ed8b33d4eca163ae88",
+      "after_sha256": "c56e71cf31080109c4895afc511ff63e6f5756a9eb2ed112f39d613a68fe1ddb"
+    },
+    "scripts/ages/scripts.s": {
+      "before_sha256": "77eee513ca54db21c885bedbff8317a08a69c13c2235c5d7386204e9ae6db00c",
+      "after_sha256": "8cf3181aec4ad988734e7362c36ca3e70d595f2fd3adcf5e77cec7f9ec1eb52c"
+    },
+    "scripts/common/scriptHelper.s": {
+      "before_sha256": "fe97f96a9691497e421134fbf68dcbb850413bdf7e872936d77f331799c0a63d",
+      "after_sha256": "ae65eff41e239045e2b57b6c24ae2653cc81abdf16ccff578cc7749d3af5d3a6"
+    },
+    "scripts/seasons/scripts.s": {
+      "before_sha256": "837659a3bc2bb1302041db5770a6155b6e1ffb5680852a3b6f64de38719e2c99",
+      "after_sha256": "6255186d18c8115f7947645c3f2af7c2d9707028a1df5317f24ccc17e018dbb0"
+    },
+    "seasons.s": {
+      "before_sha256": "fed7f6d9a4f4cdebc7d3fae7046db9a0352706c8caeb430acafa9395f10b2bae",
+      "after_sha256": "f070044743635912a8393ce78ca00597c3cc3da15fdb530459dfbbc4a8b331b4"
+    },
+    "text/ages/text.yaml": {
+      "before_sha256": "998f26831270b9e61f90a2514ea54197eaa6a67e1637dfef1110a0281bf48ad0",
+      "after_sha256": "f6990879c07ef1168967f896fa9f99a911260e73d4c1b79f78f99f840016e625"
+    },
+    "text/seasons/text.yaml": {
+      "before_sha256": "25b232e0f57feacb4084fc5de0f3480d5546a9220346055c853302257dc99f77",
+      "after_sha256": "04436dc3c04e2dcecbd93f20409531d07f3c259e6721de150ca65313201904b8"
+    },
+    "data/common/postgameHeartChestGfx.s": {
+      "before_sha256": null,
+      "after_sha256": "b12a69df202d96a43e0b0522e67812ae67c18b7cf30636a845dbb78f76f3454a"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+# All game data, generated sources, builds, test fixtures and local tools.
+/.local/
+/.venv/
+/dist/
+__pycache__/
+*.py[cod]
+# Guard against accidentally copying private/binary dependencies elsewhere.
+*.gb
+*.gbc
+*.gba
+*.rom
+*.sav
+*.state
+*.sym
+*.o
+*.exe
+*.dll
+*.so
+*.dylib
+*.whl
+*.zip
+.DS_Store
+Thumbs.db

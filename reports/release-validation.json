@@ -1,0 +1,516 @@
+{
+  "status": "passed",
+  "rom_hashes": {
+    "ages": {
+      "sha1": "ac4eaaf94c9a2288a765fe78e47e0083e314cfbd",
+      "sha256": "1af59896d2c34706dd8a01af9b879dd1e1f09716daf6ce0687549e8a89625546"
+    },
+    "seasons": {
+      "sha1": "8cfe980502f76551e79694bad6c66bc558641712",
+      "sha256": "b5e9b2e3d6fb7fea51ad41f9e176dd2f3469586a6ef9a6f4fa6fd1edf1b05869"
+    }
+  },
+  "cumulative_suites": [
+    {
+      "suite": "world",
+      "exit_code": 0,
+      "seconds": 101.7
+    },
+    {
+      "suite": "rescue-roles",
+      "exit_code": 0,
+      "seconds": 23.9
+    },
+    {
+      "suite": "maku",
+      "exit_code": 0,
+      "seconds": 33.7
+    },
+    {
+      "suite": "rites",
+      "exit_code": 0,
+      "seconds": 42.4
+    },
+    {
+      "suite": "isolation",
+      "exit_code": 0,
+      "seconds": 245.7
+    },
+    {
+      "suite": "ring-quests",
+      "exit_code": 0,
+      "seconds": 161.7
+    },
+    {
+      "suite": "heart-sequences",
+      "exit_code": 0,
+      "seconds": 82.6
+    },
+    {
+      "suite": "optional",
+      "exit_code": 0,
+      "seconds": 27.4
+    },
+    {
+      "suite": "heart",
+      "exit_code": 0,
+      "seconds": 29.8
+    },
+    {
+      "suite": "caves",
+      "exit_code": 0,
+      "seconds": 36.9
+    },
+    {
+      "suite": "dependencies",
+      "exit_code": 0,
+      "seconds": 322.7
+    },
+    {
+      "suite": "early-caves",
+      "exit_code": 0,
+      "seconds": 91.1
+    },
+    {
+      "suite": "sea",
+      "exit_code": 0,
+      "seconds": 63.0
+    },
+    {
+      "suite": "smoke",
+      "exit_code": 0,
+      "seconds": 2.7
+    },
+    {
+      "suite": "full-credits",
+      "exit_code": 0,
+      "seconds": 36.7
+    },
+    {
+      "suite": "full-ring-bag",
+      "exit_code": 0,
+      "seconds": 8.2
+    },
+    {
+      "suite": "story",
+      "exit_code": 0,
+      "seconds": 58.3
+    },
+    {
+      "suite": "victory",
+      "exit_code": 0,
+      "seconds": 41.0
+    },
+    {
+      "suite": "native-book",
+      "exit_code": 0,
+      "seconds": 51.5
+    },
+    {
+      "suite": "transport",
+      "exit_code": 0,
+      "seconds": 63.1
+    },
+    {
+      "suite": "starts",
+      "exit_code": 0,
+      "seconds": 14.1
+    },
+    {
+      "suite": "paired-transfer",
+      "exit_code": 0,
+      "seconds": 80.2
+    }
+  ],
+  "portal_cases": [
+    {
+      "game": "ages",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": false,
+      "menu": null,
+      "tile": 220,
+      "destination": [
+        5,
+        244
+      ]
+    },
+    {
+      "game": "ages",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": false,
+      "menu": "start",
+      "tile": 220,
+      "destination": [
+        5,
+        244
+      ]
+    },
+    {
+      "game": "ages",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": false,
+      "menu": "select",
+      "tile": 220,
+      "destination": [
+        5,
+        244
+      ]
+    },
+    {
+      "game": "ages",
+      "test": "Portal state persists after native room exit/return",
+      "status": "passed",
+      "closed": false
+    },
+    {
+      "game": "ages",
+      "test": "Portal state persists after native save/reboot",
+      "status": "passed",
+      "closed": false
+    },
+    {
+      "game": "ages",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": true,
+      "menu": null,
+      "tile": 249,
+      "destination": [
+        0,
+        56
+      ]
+    },
+    {
+      "game": "ages",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": true,
+      "menu": "start",
+      "tile": 249,
+      "destination": [
+        0,
+        56
+      ]
+    },
+    {
+      "game": "ages",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": true,
+      "menu": "select",
+      "tile": 249,
+      "destination": [
+        0,
+        56
+      ]
+    },
+    {
+      "game": "ages",
+      "test": "Portal state persists after native room exit/return",
+      "status": "passed",
+      "closed": true
+    },
+    {
+      "game": "ages",
+      "test": "Portal state persists after native save/reboot",
+      "status": "passed",
+      "closed": true
+    },
+    {
+      "game": "ages",
+      "test": "Native final save choice controls portal closure",
+      "status": "passed",
+      "accept_save": false,
+      "boundary": "Prepared credits screen with native boss-death room bits; native prompt, battery save and reload"
+    },
+    {
+      "game": "ages",
+      "test": "Native final save choice controls portal closure",
+      "status": "passed",
+      "accept_save": true,
+      "boundary": "Prepared credits screen with native boss-death room bits; native prompt, battery save and reload"
+    },
+    {
+      "game": "seasons",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": false,
+      "menu": null,
+      "tile": 232,
+      "destination": [
+        5,
+        157
+      ]
+    },
+    {
+      "game": "seasons",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": false,
+      "menu": "start",
+      "tile": 232,
+      "destination": [
+        5,
+        157
+      ]
+    },
+    {
+      "game": "seasons",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": false,
+      "menu": "select",
+      "tile": 232,
+      "destination": [
+        5,
+        157
+      ]
+    },
+    {
+      "game": "seasons",
+      "test": "Portal state persists after native room exit/return",
+      "status": "passed",
+      "closed": false
+    },
+    {
+      "game": "seasons",
+      "test": "Portal state persists after native save/reboot",
+      "status": "passed",
+      "closed": false
+    },
+    {
+      "game": "seasons",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": true,
+      "menu": null,
+      "tile": 1,
+      "destination": [
+        2,
+        94
+      ]
+    },
+    {
+      "game": "seasons",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": true,
+      "menu": "start",
+      "tile": 1,
+      "destination": [
+        2,
+        94
+      ]
+    },
+    {
+      "game": "seasons",
+      "test": "Portal visual and actual warp boundary",
+      "status": "passed",
+      "closed": true,
+      "menu": "select",
+      "tile": 1,
+      "destination": [
+        2,
+        94
+      ]
+    },
+    {
+      "game": "seasons",
+      "test": "Portal state persists after native room exit/return",
+      "status": "passed",
+      "closed": true
+    },
+    {
+      "game": "seasons",
+      "test": "Portal state persists after native save/reboot",
+      "status": "passed",
+      "closed": true
+    },
+    {
+      "game": "seasons",
+      "test": "Native final save choice controls portal closure",
+      "status": "passed",
+      "accept_save": false,
+      "boundary": "Prepared credits screen with native boss-death room bits; native prompt, battery save and reload"
+    },
+    {
+      "game": "seasons",
+      "test": "Native final save choice controls portal closure",
+      "status": "passed",
+      "accept_save": true,
+      "boundary": "Prepared credits screen with native boss-death room bits; native prompt, battery save and reload"
+    },
+    {
+      "game": "seasons",
+      "test": "Unrelated Seasons dungeon portal retained after linked clear",
+      "status": "passed"
+    }
+  ],
+  "packaged_cases": [
+    {
+      "game": "ages",
+      "scenario": "Before final clear - Room of Rites",
+      "status": "passed"
+    },
+    {
+      "game": "ages",
+      "scenario": "Linked clear - Closed Room of Rites",
+      "status": "passed"
+    },
+    {
+      "game": "ages",
+      "scenario": "Packaged build-specific ending state saves and reboots",
+      "status": "passed"
+    },
+    {
+      "game": "seasons",
+      "scenario": "Before final clear - Room of Rites",
+      "status": "passed"
+    },
+    {
+      "game": "seasons",
+      "scenario": "Linked clear - Closed Room of Rites",
+      "status": "passed"
+    },
+    {
+      "game": "seasons",
+      "scenario": "Packaged build-specific ending state saves and reboots",
+      "status": "passed"
+    }
+  ],
+  "changed_source": [
+    "code/ages/roomGfxChanges.s",
+    "code/bank0.s",
+    "object_code/common/interactions/gameCompleteDialog.s",
+    "object_code/seasons/interactions/portalSpawner.s"
+  ],
+  "ram_layout_unchanged": true,
+  "graphics_comparisons": [
+    {
+      "game": "ages",
+      "completed": false,
+      "menu": null,
+      "changed_pixels": 0,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "ages",
+      "completed": false,
+      "menu": "start",
+      "changed_pixels": 0,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "ages",
+      "completed": false,
+      "menu": "select",
+      "changed_pixels": 0,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "ages",
+      "completed": true,
+      "menu": null,
+      "changed_pixels": 176,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "ages",
+      "completed": true,
+      "menu": "start",
+      "changed_pixels": 214,
+      "outside_portal": 38,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "ages",
+      "completed": true,
+      "menu": "select",
+      "changed_pixels": 193,
+      "outside_portal": 17,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "seasons",
+      "completed": false,
+      "menu": null,
+      "changed_pixels": 0,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "seasons",
+      "completed": false,
+      "menu": "start",
+      "changed_pixels": 0,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "seasons",
+      "completed": false,
+      "menu": "select",
+      "changed_pixels": 0,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "seasons",
+      "completed": true,
+      "menu": null,
+      "changed_pixels": 256,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "seasons",
+      "completed": true,
+      "menu": "start",
+      "changed_pixels": 256,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    },
+    {
+      "game": "seasons",
+      "completed": true,
+      "menu": "select",
+      "changed_pixels": 256,
+      "outside_portal": 0,
+      "outside_portal_and_known_water_ripple": 0,
+      "layout_and_collisions_outside_portal_unchanged": true
+    }
+  ],
+  "clean_public_rebuild_matches": true,
+  "cleanup": {
+    "stale_receiver_comment_removed": true,
+    "obsolete_book_scripts_archived": 6
+  },
+  "retained_vanilla_issues": [
+    "Ages Level 1 torch-room/secret-shop fallthrough retained by design."
+  ],
+  "confirmed_unresolved_hack_defects": [],
+  "scope_limits": [
+    "Prepared checkpoints, not complete playthroughs of either order.",
+    "Ending-choice cases begin at the credits/save boundary with native Ganon death room bits prepared; the boss battle is not replayed.",
+    "Ages water-ripple animation phase can differ when the portal sprite is removed; layout/collision data outside the portal tile and other sampled pixels are unchanged.",
+    "Authentic GBA boot, physical hardware and serial linking remain unverified."
+  ]
+}

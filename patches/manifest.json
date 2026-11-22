@@ -1,0 +1,28 @@
+{
+  "label": "Postgame Room of Rites closure cumulative patch",
+  "upstream_commit": "21c924afdc8a13225e849214479d5113da2ec226",
+  "games": {
+    "ages": {
+      "patch": "patches/Oracle of Ages - 100 Percent.bps",
+      "source_size": 1048576,
+      "source_sha1": "880374fb978b18af4aa529e2e32f7ffb4d7dd2f4",
+      "source_sha256": "0b56b78a9e45452e98c33edd111234931f1e034dc097f6f23082eb8db6055474",
+      "source_crc32": "3800a387",
+      "target_sha1": "ac4eaaf94c9a2288a765fe78e47e0083e314cfbd",
+      "target_sha256": "1af59896d2c34706dd8a01af9b879dd1e1f09716daf6ce0687549e8a89625546",
+      "target_crc32": "204277b8",
+      "patch_sha256": "520aa1ac662a65695f13662076ed98f2ba50d9d195bf051a228f7f859b6a3dfc"
+    },
+    "seasons": {
+      "patch": "patches/Oracle of Seasons - 100 Percent.bps",
+      "source_size": 1048576,
+      "source_sha1": "ba1268290fb2b1b70505d2d7b5825fc8a4816a4b",
+      "source_sha256": "862a51368fb30539279d336b3fe193b43876d2cb15c87a36f5da517804ab3971",
+      "source_crc32": "d7e9f5d7",
+      "target_sha1": "8cfe980502f76551e79694bad6c66bc558641712",
+      "target_sha256": "b5e9b2e3d6fb7fea51ad41f9e176dd2f3469586a6ef9a6f4fa6fd1edf1b05869",
+      "target_crc32": "8d48df92",
+      "patch_sha256": "15d594852691dc6cfb2235685d484de813de44fa5fc53cf7947bd64c2af996b3"
+    }
+  }
+}

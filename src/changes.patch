@@ -1,0 +1,1409 @@
+--- a/ages.s
++++ b/ages.s
+@@ -94,6 +94,7 @@
+ 		.include {"{GAME_DATA_DIR}/singleTileChanges.s"}
+ 		.include "code/ages/roomSpecificTileChanges.s"
+ 	.ends
++	.include "data/common/postgameHeartChestGfx.s"
+ 
+ 	 m_section_free Tileset_Loading_2 NAMESPACE tilesets
+ 		.include "code/loadTilesToRam.s"
+--- a/code/ages/cutscenes/bank10.s
++++ b/code/ages/cutscenes/bank10.s
+@@ -439,8 +439,6 @@
+ 	call fileSelect_redrawDecorations
+ 	call decCbb3
+ 	ret nz
+-	call checkIsLinkedGame
+-	jr nz,+
+ 	call getFreeInteractionSlot
+ 	jr nz,+
+ 	ld (hl),$d1
+@@ -450,12 +448,6 @@
+ 	jp incCbc2
+ @substate7:
+ 	call fileSelect_redrawDecorations
+-	call checkIsLinkedGame
+-	jr z,@func_7407
+-	ld a,(wKeysJustPressed)
+-	and $01
+-	jr nz,++
+-	ret
+ @func_7407:
+ 	ld a,($cfde)
+ 	or a
+--- a/code/ages/roomGfxChanges.s
++++ b/code/ages/roomGfxChanges.s
+@@ -185,8 +185,7 @@
+ ; so it's not drawn here.)
+ ;
+ roomTileChangesAfterLoad09:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ret z
+ 	ld hl,@tiles
+ 	jp drawRectangleToVramTiles
+@@ -200,7 +199,7 @@
+ 
+ ;;
+ ; Maku tree present: same behaviour as maku tree past, and also creates a staircase tile
+-; which leads to the final dungeon when Veran is defeated (and when it's a linked game).
++; which leads to the final dungeon after Veran in a linked game, until the saved final clear.
+ ;
+ ; A portal gets put on top of the staircase, so you don't see it.
+ ;
+@@ -208,6 +207,11 @@
+ 	call roomTileChangesAfterLoad0a
+ 	call checkIsLinkedGame
+ 	ret z
++
++	; The saved final clear closes the Room of Rites entrance and its decoration.
++	ld a,GLOBALFLAG_BEAT_GANON
++	call checkGlobalFlag
++	ret nz
+ 
+ 	; Check a flag in the room Veran is fought in
+ 	ld a,(wGroup4RoomFlags+$fc)
+--- a/code/ages/roomSpecificCode.s
++++ b/code/ages/roomSpecificCode.s
+@@ -161,8 +161,7 @@
+ ;;
+ ; Play nayru music on impa's house screen, for some reason
+ roomSpecificCode9:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ret z
+ 	ld a, MUS_NAYRU
+ 	ld (wActiveMusic2),a
+--- a/code/bank0.s
++++ b/code/bank0.s
+@@ -5433,6 +5433,56 @@
+ 	ret
+ 
+ ;;
++; NZ only after saving the first adventure at the credits.
++checkFirstAdventureFinished:
++	call checkIsLinkedGame
++	jr nz,@unavailable
++	ld a,(wFileIsHeroGame)
++	or a
++	jr nz,@unavailable
++	ld a,GLOBALFLAG_FINISHEDGAME
++	jp checkGlobalFlag
++@unavailable:
++	xor a
++	ret
++
++;;
++; NZ after this adventure is complete. Use for peaceful world state,
++; not Game 1-only quests or the family departure.
++; Game 1 uses its native flag; Game 2 uses the saved Ganon clear.
++checkAdventureComplete:
++	call checkIsLinkedGame
++	ld a,GLOBALFLAG_FINISHEDGAME
++	jr z,+
++	ld a,GLOBALFLAG_BEAT_GANON
+++
++	jp checkGlobalFlag
++
++;;
++; Earlier experimental patches saved Game 1's completion markers in linked
++; Ganon-cleared files. Normalize only that combination when loading a file.
++normalizeLinkedClearState:
++	ld a,(wFileIsLinkedGame)
++	or a
++	ret z
++	ld a,GLOBALFLAG_BEAT_GANON
++	call checkGlobalFlag
++	ret z
++	xor a
++	ld (wFileIsCompleted),a
++	ld a,GLOBALFLAG_FINISHEDGAME
++	call unsetGlobalFlag
++.ifdef ROM_AGES
++	; Existing linked clears also receive the peaceful map descriptions on load.
++setCompletedMakuMapText:
++	ld a,<TX_051c
++	ld (wMakuMapTextPresent),a
++	ld a,<TX_058c
++	ld (wMakuMapTextPast),a
++.endif
++	ret
++
++;;
+ ; @param	hl	Where to copy the values from for wWarpDestVariables
+ setWarpDestVariables:
+ 	push de
+--- a/code/bank2.s
++++ b/code/bank2.s
+@@ -3178,6 +3178,7 @@
+ 	call reloadObjectGfx
+ 	call loadTilesetData
+ 	call loadTilesetGraphics
++	callab roomTileChanges.restorePostgameHeartChestGfx
+ 	call reloadTileMap
+ 	call fastFadeinFromWhiteToRoom
+ 	ld a,(wExtraBgPaletteHeader)
+--- a/code/bank4.s
++++ b/code/bank4.s
+@@ -132,6 +132,9 @@
+ 	ld (wWarpDestRoom),a
+ 	ldi a,(hl)
+ 	ld (wWarpDestPos),a
++.ifdef ROM_SEASONS
++	call adjustFirstAdventureHerosCaveExit
++.endif
+ 	ldi a,(hl)
+ 	or $80
+ 	ld (wWarpTransition),a
+@@ -183,6 +186,29 @@
+ 	jp loadScreenMusicAndSetRoomPack
+ .endif
+ 
++.ifdef ROM_SEASONS
++; The expanded cave uses the upper door in the first adventure.
++adjustFirstAdventureHerosCaveExit:
++	ld a,(wWarpDestGroup)
++	and $07
++	ret nz
++	ld a,(wActiveGroup)
++	cp >ROOM_SEASONS_530
++	ret nz
++	ld a,(wActiveRoom)
++	cp <ROOM_SEASONS_530
++	ret nz
++	ld a,(wWarpDestRoom)
++	cp <ROOM_SEASONS_0d4
++	ret nz
++	call checkIsLinkedGame
++	ret nz
++	; Return to the ledge below the door, outside the dynamic warp tile.
++	ld a,FIRST_ADVENTURE_HEROS_CAVE_ENTRANCE+$10
++	ld (wWarpDestPos),a
++	ret
++.endif
++
+ ;;
+ ; Sets wWarpDestRoom, wWarpDestGroup, wWarpTransition with suitable warp data. If no
+ ; good warp data is found, it defaults to warping to itself (the current position).
+--- a/code/commonTileSubstitutions.s
++++ b/code/commonTileSubstitutions.s
+@@ -1,4 +1,11 @@
+ ; This is included at the end of the "code/<game>/tileSubstitutions.s" file.
++
++; Use unused background tiles in VRAM bank 1. Bank 0 is used for textbox glyphs.
++.ifdef ROM_AGES
++	.define POSTGAME_HEART_CHEST_TILE $60
++.else
++	.define POSTGAME_HEART_CHEST_TILE $00
++.endif
+ 
+ ;;
+ ; Replaces a shutter link is about to walk on to with empty floor.
+@@ -132,6 +139,8 @@
+ 
+ ;;
+ replaceOpenedChest:
++	call isPostgameHeartChestRoom
++	jr z,placePostgameHeartChest
+ 	call getThisRoomFlags
+ 	bit ROOMFLAG_BIT_ITEM,a
+ 	ret z
+@@ -141,6 +150,97 @@
+ 	ld a,TILEINDEX_CHEST_OPENED
+ 	ld (de),a
+ 	ret
++
++;;
++; Z if the room is the first adventure's post-credits reload screen.
++isPostgameHeartChestRoom:
++	ld a,(wActiveGroup)
++.ifdef ROM_AGES
++	cp >ROOM_AGES_038
++.else
++	cp >ROOM_SEASONS_25d
++.endif
++	ret nz
++	ld a,(wActiveRoom)
++.ifdef ROM_AGES
++	cp <ROOM_AGES_038
++.else
++	cp <ROOM_SEASONS_25d
++.endif
++	ret
++
++recordOpenedChest:
++	call isPostgameHeartChestRoom
++	jr nz,@normalChest
++	ld a,GLOBALFLAG_OPENED_POSTGAME_HEART_CHEST
++	jp setGlobalFlag
++@normalChest:
++	call getThisRoomFlags
++	set ROOMFLAG_BIT_ITEM,(hl)
++	ret
++
++;;
++; Use a separate flag to avoid sharing the reward with another Seasons room.
++placePostgameHeartChest:
++	call checkFirstAdventureFinished
++	ret z
++
++	ld a,GLOBALFLAG_OPENED_POSTGAME_HEART_CHEST
++	call checkGlobalFlag
++	ld a,TILEINDEX_CHEST_OPENED
++	jr nz,@place
++	ld a,(wLinkMaxHealth)
++	cp $40 ; Already at 16 hearts
++	ret nc
++	ld a,TILEINDEX_CHEST
++@place:
++	push af
++	call getChestData
++	pop af
++	ld d,>wRoomLayout
++	ld (de),a
++
++	; Maku Tree tilesets leave the chest graphics and collisions undefined.
++	ld a,($ff00+R_SVBK)
++	push af
++	ld a,:w3TileMappingData
++	ld ($ff00+R_SVBK),a
++	ld hl,postgameHeartChestMappings
++	ld de,w3TileMappingData + TILEINDEX_CHEST_OPENED * 8
++	ld b,$10
++	call copyMemory
++	ld hl,w3TileCollisions + TILEINDEX_CHEST_OPENED
++	ld (hl),$0f
++	inc hl
++	ld (hl),$0f
++	pop af
++	ld ($ff00+R_SVBK),a
++
++loadPostgameHeartChestGfx:
++	ld hl,postgameHeartChestGfx
++	ld c,:postgameHeartChestGfx
++	ld de,$9001 + POSTGAME_HEART_CHEST_TILE * $10
++	ld b,$02 ; Three 8x8 tiles.
++	jp queueDmaTransfer
++
++;;
++; The pause menu restores the base tileset without rerunning tile substitutions.
++restorePostgameHeartChestGfx:
++	call isPostgameHeartChestRoom
++	ret nz
++	call getChestData
++	ld d,>wRoomLayout
++	ld a,(de)
++	sub TILEINDEX_CHEST_OPENED
++	cp $02 ; Open or closed chest
++	ret nc
++	jr loadPostgameHeartChestGfx
++
++postgameHeartChestMappings:
++	.db POSTGAME_HEART_CHEST_TILE,   POSTGAME_HEART_CHEST_TILE,   POSTGAME_HEART_CHEST_TILE+2, POSTGAME_HEART_CHEST_TILE+2
++	.db $08 $28 $08 $28
++	.db POSTGAME_HEART_CHEST_TILE+1, POSTGAME_HEART_CHEST_TILE+1, POSTGAME_HEART_CHEST_TILE+2, POSTGAME_HEART_CHEST_TILE+2
++	.db $08 $28 $08 $28
+ 
+ ;;
+ ; Replaces switch tiles and whatever they control if the switch is set.
+@@ -271,6 +371,9 @@
+ 
+ 	cp $f2
+ 	jr z,@finishedGameOnly
++
++	cp $f4
++	jr z,@beforeUnlinkedPirateDeparture
+ .endif
+ 
+ 	ld a,(hl)
+@@ -305,6 +408,16 @@
+ @linkedOnly:
+ 	call checkIsLinkedGame
+ 	jr z,@notMatch
++	jr @match
++
++@beforeUnlinkedPirateDeparture:
++	call checkIsLinkedGame
++	jr nz,@notMatch
++	push hl
++	ld a,GLOBALFLAG_PIRATES_GONE
++	call checkGlobalFlag
++	pop hl
++	jr nz,@notMatch
+ 	jr @match
+ 
+ @finishedGameOnly:
+--- a/code/fileManagement.s
++++ b/code/fileManagement.s
+@@ -116,6 +116,7 @@
+ 	ld h,b
+ 	ld de,wFileStart
+ 	call copyFileFromHlToDe
++	call normalizeLinkedClearState
+ 	pop af
+ 	ret
+ 
+--- a/code/interactableTiles.s
++++ b/code/interactableTiles.s
+@@ -130,8 +130,7 @@
+ 	or $08
+ 	ld (hl),a
+ +++
+-	call getThisRoomFlags
+-	set ROOMFLAG_BIT_ITEM,(hl)
++	callab roomTileChanges.recordOpenedChest
+ 	xor a
+ 	ld (wChestContentsOverride),a
+ 	ld (wChestContentsOverride+1),a
+--- a/code/seasons/cutscenes/endgameCutscenes.s
++++ b/code/seasons/cutscenes/endgameCutscenes.s
+@@ -1913,8 +1913,6 @@
+ 	call fileSelect_redrawDecorations
+ 	call decCbb3
+ 	ret nz
+-	call checkIsLinkedGame
+-	jr nz,+
+ 	call getFreeInteractionSlot
+ 	jr nz,+
+ 	ld (hl),INTERAC_GAME_COMPLETE_DIALOG
+@@ -1925,13 +1923,6 @@
+ 
+ @state7:
+ 	call fileSelect_redrawDecorations
+-	call checkIsLinkedGame
+-	jr z,+
+-	ld a,(wKeysJustPressed)
+-	and BTN_A
+-	jr nz,++
+-	ret
+-+
+ 	ld a,($cfde)
+ 	or a
+ 	ret z
+--- a/code/seasons/roomSpecificTileChanges.s
++++ b/code/seasons/roomSpecificTileChanges.s
+@@ -53,6 +53,7 @@
+ 	.dw tileReplacement_group5Map8e ; $2c
+ 	.dw tileReplacement_group5Map3b ; $2d
+ 	.dw tileReplacement_group4Map61 ; $2e
++	.dw openFirstAdventureHerosCaveEntrance ; $2f
+ 
+ roomTileChangerCodeGroupTable:
+ 	.dw roomTileChangerCodeGroup0Data
+@@ -65,6 +66,7 @@
+ 	.dw roomTileChangerCodeGroup7Data
+ 
+ roomTileChangerCodeGroup0Data:
++	.db $d4 $2f
+ 	.db $c5 $00
+ 	.db $d9 $01
+ 	.db $54 $10
+@@ -131,6 +133,14 @@
+ roomTileChangerCodeGroup7Data:
+ 	.db $00
+ 
++	ret
++
++; Additional entrance in the wall above the original sword cave.
++openFirstAdventureHerosCaveEntrance:
++	call checkIsLinkedGame
++	ret nz
++	ld a,TILEINDEX_OPEN_CAVE_DOOR
++	ld (wRoomLayout+FIRST_ADVENTURE_HEROS_CAVE_ENTRANCE),a
+ 	ret
+ 
+ ; Adds a sign outside couple's house
+--- a/constants/common/globalFlags.s
++++ b/constants/common/globalFlags.s
+@@ -260,5 +260,5 @@
+ 	GLOBALFLAG_7c				db ; $7c
+ 	GLOBALFLAG_7d				db ; $7d
+ 	GLOBALFLAG_7e				db ; $7e
+-	GLOBALFLAG_7f				db ; $7f
++	GLOBALFLAG_OPENED_POSTGAME_HEART_CHEST	db ; $7f
+ .ENDE
+--- a/constants/common/interactions.s
++++ b/constants/common/interactions.s
+@@ -469,7 +469,7 @@
+ .define INTERAC_COMPANION_TUTORIAL $d0
+ 
+ ;;
+-; Shows the dialog after completing the game prompting you to save (unlinked only).
++; Shows the save prompt after completing either adventure.
+ .define INTERAC_GAME_COMPLETE_DIALOG $d1
+ 
+ ;;
+--- a/data/ages/chestData.s
++++ b/data/ages/chestData.s
+@@ -17,6 +17,7 @@
+ 	.dw chestGroup7Data
+ 
+ chestGroup0Data:
++	m_ChestData $55, <ROOM_AGES_038, TREASURE_OBJECT_HEART_CONTAINER_01
+ 	m_ChestData $49, $51, TREASURE_OBJECT_RUPEES_04
+ 	m_ChestData $51, $49, TREASURE_OBJECT_RUPEES_04
+ 	m_ChestData $36, $84, TREASURE_OBJECT_RUPEES_05
+--- a/data/ages/singleTileChanges.s
++++ b/data/ages/singleTileChanges.s
+@@ -15,6 +15,7 @@
+ ;       * $f0: the change applies to unlinked games.
+ ;       * $f1: the change applies to linked games.
+ ;       * $f2: the change applies after finishing an unlinked game.
++;       * $f4: the change applies in unlinked games until the pirates depart.
+ ; b2: Position of tile to change
+ ; b3: New tile to put at that position
+ 
+@@ -24,7 +25,6 @@
+ 	.db $13 $02 $42 $d7
+ 	.db $13 $04 $47 $d7
+ 	.db $0a $80 $17 $ee
+-	.db $48 $f0 $28 $64
+ 	.db $47 $f2 $36 $f2
+ 	.db $88 $02 $66 $3a
+ 	.db $6a $02 $48 $3a
+@@ -49,7 +49,7 @@
+ 	.db $00 $00
+ 
+ singleTileChangeGroup2Data:
+-	.db $d7 $f0 $42 $e9
++	.db $d7 $f4 $42 TILEINDEX_WHIRLPOOL ; Present-day Sea of Storms entrance
+ 	.db $00 $00
+ 
+ singleTileChangeGroup3Data:
+--- a/data/seasons/chestData.s
++++ b/data/seasons/chestData.s
+@@ -33,6 +33,11 @@
+ 	.db $ff
+ 
+ chestGroup2Data:
++	m_ChestData $55, <ROOM_SEASONS_25d, TREASURE_OBJECT_HEART_CONTAINER_01
++	m_ChestData $34, $9b, TREASURE_OBJECT_GASHA_SEED_01
++	m_ChestData $13, $88, TREASURE_OBJECT_BOMBS_00
++	.db $ff
++
+ chestGroup3Data:
+ 	m_ChestData $34, $9b, TREASURE_OBJECT_GASHA_SEED_01
+ 	m_ChestData $13, $88, TREASURE_OBJECT_BOMBS_00
+--- a/data/seasons/tile_properties/interactableTiles.s
++++ b/data/seasons/tile_properties/interactableTiles.s
+@@ -48,7 +48,9 @@
+ 	.db $f1 $04
+ 	.db $f2 $05
+ 	.db $ec $07
++	.db $00
+ @makutree:
++	.db TILEINDEX_CHEST $04
+ 	.db $00
+ 
+ @indoors:
+--- a/data/seasons/warpSources.s
++++ b/data/seasons/warpSources.s
+@@ -211,6 +211,7 @@
+ 	m_WarpListEndWithDefault
+ 
+ warpSource764b:
++	m_PositionWarp FIRST_ADVENTURE_HEROS_CAVE_ENTRANCE $04 $5 $4
+ 	m_PositionWarp $57 $01 $4 $9
+ 	m_PositionWarp $54 $00 $4 $4
+ 	m_WarpListEndWithDefault
+--- a/include/script_commands.s
++++ b/include/script_commands.s
+@@ -430,6 +430,17 @@
+ .MACRO writec6xx
+ 	.db $b4
+ 	.db \1, \2
++.ENDM
++
++; Shared completion conditional; expands existing opcodes, not a new opcode.
++; param1[16]: Destination if Game 1 is finished or Game 2's Ganon clear is saved.
++.MACRO jumpifadventurecomplete
++	jumpifmemoryeq wIsLinkedGame, $00, @adventureUnlinked\@
++	jumpifglobalflagset GLOBALFLAG_BEAT_GANON, \1
++	scriptjump @adventureDone\@
++@adventureUnlinked\@:
++	jumpifglobalflagset GLOBALFLAG_FINISHEDGAME, \1
++@adventureDone\@:
+ .ENDM
+ 
+ ; Jump to the specified address if the given global flag is set.
+--- a/object_code/ages/interactions/adlar.s
++++ b/object_code/ages/interactions/adlar.s
+@@ -15,8 +15,7 @@
+ 
+ 	; Decide on a value to write to var38; this will affect the script.
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ld a,$04
+ 	jr nz,@setVar38
+ 
+--- a/object_code/ages/interactions/ambi.s
++++ b/object_code/ages/interactions/ambi.s
+@@ -144,6 +144,8 @@
+ @initSubid0a:
+ 	call checkIsLinkedGame
+ 	jp z,interactionDelete
++	call checkAdventureComplete
++	jp nz,interactionDelete
+ 	ld hl,wGroup4RoomFlags+$fc
+ 	bit 7,(hl)
+ 	jp z,interactionDelete
+--- a/object_code/ages/interactions/bear.s
++++ b/object_code/ages/interactions/bear.s
+@@ -62,8 +62,7 @@
+ 	ld hl,objectData.animalsWaitingForNayru
+ 	call parseGivenObjectData
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	ld a,GLOBALFLAG_MAKU_TREE_SAVED
+ 	call checkGlobalFlag
+@@ -79,8 +78,7 @@
+ 	jr ++
+ 
+ @var03IsNonzero:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 	ld a,$02
+ ++
+--- a/object_code/ages/interactions/boy.s
++++ b/object_code/ages/interactions/boy.s
+@@ -235,8 +235,7 @@
+ 	jp boyLoadScript
+ 
+ @initSubid10:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 
+ @initSubid0f:
+--- a/object_code/ages/interactions/boy2.s
++++ b/object_code/ages/interactions/boy2.s
+@@ -15,8 +15,7 @@
+ 	jr nz,@@state1
+ 
+ @@state0:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	ld a,GLOBALFLAG_0b
+ 	call checkGlobalFlag
+--- a/object_code/ages/interactions/forestFairy.s
++++ b/object_code/ages/interactions/forestFairy.s
+@@ -531,8 +531,7 @@
+ 	bit 6,a
+ 	jp z,interactionDelete
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld e,Interaction.subid
+@@ -582,8 +581,7 @@
+ forestFairy_standardUpdate_2:
+ 	jr nz,forestFairy_standardUpdate
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 
+ 	ld e,Interaction.subid
+--- a/object_code/ages/interactions/impaNpc.s
++++ b/object_code/ages/interactions/impaNpc.s
+@@ -248,8 +248,7 @@
+ ;
+ ; @param[out]	b	Return value
+ getImpaNpcState:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ld b,$ff
+ 	ret nz
+ 	inc b
+--- a/object_code/ages/interactions/makuSprout.s
++++ b/object_code/ages/interactions/makuSprout.s
+@@ -136,6 +136,8 @@
+ 	jr @runSubid0ScriptMode
+ 
+ @state10:
++	call checkAdventureComplete
++	jr nz,++
+ 	call checkIsLinkedGame
+ 	jr z,++
+ 
+--- a/object_code/ages/interactions/makuTree.s
++++ b/object_code/ages/interactions/makuTree.s
+@@ -209,6 +209,8 @@
+ 	jr @runSubid0ScriptMode
+ 
+ @state10:
++	call checkAdventureComplete
++	jr nz,++
+ 	call checkIsLinkedGame
+ 	jr z,++
+ 	ldbc $00, <TX_051a
+--- a/object_code/ages/interactions/miscMan.s
++++ b/object_code/ages/interactions/miscMan.s
+@@ -16,8 +16,7 @@
+ @subid0:
+ 	call checkInteractionState
+ 	jr nz,++
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	ld a,GLOBALFLAG_0b
+ 	call checkGlobalFlag
+--- a/object_code/ages/interactions/miscMan2.s
++++ b/object_code/ages/interactions/miscMan2.s
+@@ -16,8 +16,7 @@
+ 	call checkInteractionState
+ 	jr nz,@@initialized
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	call @initGraphicsIncStateAndLoadScript
+ 
+@@ -117,11 +116,10 @@
+ ;			$02 if saved Nayru;
+ ;			$03 if beat d7;
+ ;			$04 if got the maku seed (saw twinrova cutscene);
+-;			$05 if game finished (unlinked only)
++;			$05 if this adventure is complete (Game 1 or saved Ganon clear)
+ getGameProgress_1:
+ 	ld b,$05
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ret nz
+ 
+ 	dec b
+@@ -161,11 +159,10 @@
+ ;			$04 if beat d7;
+ ;			$05 if got the maku seed (saw twinrova cutscene);
+ ;			$06 if beat veran but not twinrova (linked only);
+-;			$07 if game finished (unlinked only)
++;			$07 if this adventure is complete (Game 1 or saved Ganon clear)
+ getGameProgress_2:
+ 	ld b,$07
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ret nz
+ 
+ 	dec b
+--- a/object_code/ages/interactions/miscellaneous1.s
++++ b/object_code/ages/interactions/miscellaneous1.s
+@@ -753,8 +753,7 @@
+ 	jp nz,interaction6b_subid0e@state1
+ 
+ @state0:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 	call objectGetShortPosition
+ 	ld h,>wRoomCollisions
+--- a/object_code/ages/interactions/monkeyMain.s
++++ b/object_code/ages/interactions/monkeyMain.s
+@@ -287,8 +287,7 @@
+ 	.dw @subid7Init_2
+ 
+ @subid7Init_0:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,GLOBALFLAG_SAVED_NAYRU
+@@ -301,8 +300,7 @@
+ 	jr @setVar3aAnimation
+ 
+ @subid7Init_1:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 
+ 	ld hl,mainScripts.monkeySubid7Script_1
+@@ -311,8 +309,7 @@
+ 	jr @setVar3aAnimation
+ 
+ @subid7Init_2:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,GLOBALFLAG_MAKU_TREE_SAVED
+--- a/object_code/ages/interactions/mustacheMan.s
++++ b/object_code/ages/interactions/mustacheMan.s
+@@ -12,8 +12,7 @@
+ 	call checkInteractionState
+ 	jr nz,@@initialized
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	call @initGraphicsAndScript
+ @@initialized:
+--- a/object_code/ages/interactions/nayru.s
++++ b/object_code/ages/interactions/nayru.s
+@@ -160,8 +160,7 @@
+ 	jp interactionSetScript
+ 
+ @init0b:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,GLOBALFLAG_SAVED_NAYRU
+@@ -184,8 +183,7 @@
+ 	jp interactionSetScript
+ 
+ @init0c:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,GLOBALFLAG_PRE_BLACK_TOWER_CUTSCENE_DONE
+@@ -204,8 +202,7 @@
+ 	call checkGlobalFlag
+ 	jp z,interactionDelete
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,<TX_1d17
+@@ -250,8 +247,7 @@
+ 	jp interactionSetPosition
+ 
+ @init13:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 
+ 	ld hl,mainScripts.nayruScript13
+--- a/object_code/ages/interactions/pastGuy.s
++++ b/object_code/ages/interactions/pastGuy.s
+@@ -16,8 +16,7 @@
+ 
+ ; Guy who wants to find something Ambi desires
+ @subid0:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,GLOBALFLAG_0b
+--- a/object_code/ages/interactions/pastOldLady.s
++++ b/object_code/ages/interactions/pastOldLady.s
+@@ -14,8 +14,7 @@
+ 	call checkInteractionState
+ 	jr nz,@@initialized
+ 
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	call @initGraphicsTextAndScript
+ 
+--- a/object_code/ages/interactions/rabbitMain.s
++++ b/object_code/ages/interactions/rabbitMain.s
+@@ -99,8 +99,7 @@
+ 	jp rabbitJump
+ 
+ @initSubid7:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,GLOBALFLAG_MAKU_TREE_SAVED
+--- a/object_code/ages/interactions/ralph.s
++++ b/object_code/ages/interactions/ralph.s
+@@ -264,8 +264,7 @@
+ 	jr @setScriptAndDisableObjects
+ 
+ @initSubid11:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 
+ 	ld a,$03
+@@ -293,6 +292,8 @@
+ @initSubid12:
+ 	call checkIsLinkedGame
+ 	jp z,interactionDelete
++	call checkAdventureComplete
++	jp nz,interactionDelete
+ 	ld hl,wGroup4RoomFlags + (<ROOM_AGES_4fc)
+ 	bit 7,(hl)
+ 	jp z,interactionDelete
+--- a/object_code/ages/interactions/soldier.s
++++ b/object_code/ages/interactions/soldier.s
+@@ -22,8 +22,7 @@
+ 
+ soldierSubid00:
+ soldierSubid01:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 
+ 	ld a,GLOBALFLAG_0b
+@@ -319,8 +318,7 @@
+ 	jr nz,@state1
+ 
+ @state0:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 
+ 	call soldierInitGraphicsAndLoadScript
+--- a/object_code/common/interactions/dungeonStuff.s
++++ b/object_code/common/interactions/dungeonStuff.s
+@@ -57,11 +57,17 @@
+ 	ret nc
+ 
+ 	ld a,(wDungeonIndex)
++.ifdef ROM_SEASONS
++	; Reserve the Hero's Cave entry title for the expanded dungeon.
++	or a
++	jr z,@setRespawn
++.endif
+ 	ld hl,@dungeonTextIndices
+ 	rst_addAToHl
+ 	ld c,(hl)
+ 	ld b,>TX_0200
+ 	call showText
++@setRespawn:
+ 	call setDeathRespawnPoint
+ 	jp interactionDelete
+ 
+--- a/object_code/common/interactions/gameCompleteDialog.s
++++ b/object_code/common/interactions/gameCompleteDialog.s
+@@ -13,5 +13,13 @@
+ 	ld (de),a
+ 	ld c,a
+ 	callab bank1.loadDeathRespawnBufferPreset
++.ifdef ROM_SEASONS
++	; Linked adventures reload at the fully-grown Maku Tree.
++	call checkIsLinkedGame
++	jr z,+
++	ld a,<ROOM_SEASONS_25e
++	ld (wDeathRespawnBuffer.room),a
+++
++.endif
+ 	ld hl,mainScripts.gameCompleteDialogScript
+ 	jp interactionSetScript
+--- a/object_code/seasons/interactions/din.s
++++ b/object_code/seasons/interactions/din.s
+@@ -68,8 +68,7 @@
+ 	ld hl,mainScripts.dinScript_stubInit
+ 	jp interactionSetScript
+ @subid8:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 	ld a,$06
+ 	call interactionSetAnimation
+--- a/object_code/seasons/interactions/dinDancingEvent.s
++++ b/object_code/seasons/interactions/dinDancingEvent.s
+@@ -279,8 +279,7 @@
+ 	call checkInteractionSubstate
+ 	jr nz,+
+ 	call interactionIncSubstate
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ +
+ 	jp @@subid9@animate
+--- a/object_code/seasons/interactions/impa.s
++++ b/object_code/seasons/interactions/impa.s
+@@ -10,8 +10,7 @@
+ @state0:
+ 	ld a,$01
+ 	ld (de),a
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	call interactionInitGraphics
+ 	call objectSetVisible82
+--- a/object_code/seasons/interactions/linkedMasterDiver.s
++++ b/object_code/seasons/interactions/linkedMasterDiver.s
+@@ -16,11 +16,15 @@
+ 	.dw @subid1
+ 	.dw @subid2
+ @subid0:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp z,interactionDelete
+ 	call interactionInitGraphics
+ 	call interactionIncState
++	; A linked ending also brings him home, without enabling Game 1's secret quest.
++	ld a,(wIsLinkedGame)
++	or a
++	ld hl,mainScripts.masterDiverScript_text1
++	jr nz,@setScript
+ 	ld a,$4c
+ 	call interactionSetHighTextIndex
+ 	ld a,GLOBALFLAG_DONE_DIVER_SECRET
+--- a/object_code/seasons/interactions/loneZora.s
++++ b/object_code/seasons/interactions/loneZora.s
+@@ -8,6 +8,8 @@
+ 	.dw @state0
+ 	.dw @state1
+ @state0:
++	call checkIsLinkedGame
++	jp z,interactionDelete
+ 	ld a,$01
+ 	ld (de),a
+ 	call interactionInitGraphics
+--- a/object_code/seasons/interactions/makuTree.s
++++ b/object_code/seasons/interactions/makuTree.s
+@@ -78,8 +78,7 @@
+ 
+ ; This label in used directly from bank 0.
+ makuTree_setAppropriateStage:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,@setStageToLast
+ 	ld a,TREASURE_ESSENCE
+ 	call checkTreasureObtained
+--- a/object_code/seasons/interactions/miscNpcs.s
++++ b/object_code/seasons/interactions/miscNpcs.s
+@@ -272,8 +272,7 @@
+ ;			$01 if no essences, but met maku tree
+ ;			$00 if no essences, and not met maku tree
+ checkNPCStage:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ld b,$0a
+ 	jr nz,+
+ 	ld a,TREASURE_ESSENCE
+@@ -358,8 +357,7 @@
+ 
+ ; This label is used directly in a number of places.
+ @main:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	ld b,$04
+ 	jr nz,@xorARet
+ 	ld a,GLOBALFLAG_ZELDA_KIDNAPPED_SEEN
+--- a/object_code/seasons/interactions/portalSpawner.s
++++ b/object_code/seasons/interactions/portalSpawner.s
+@@ -9,6 +9,24 @@
+ 	.dw @state1
+ 	.dw interactionAnimate
+ @state0:
++	; Close only the linked Maku Tree entrance after its saved final clear.
++	call checkIsLinkedGame
++	jr z,@initialize
++	ld a,(wActiveGroup)
++	cp >ROOM_SEASONS_25e
++	jr nz,@initialize
++	ld a,(wActiveRoom)
++	cp <ROOM_SEASONS_25e
++	jr nz,@initialize
++	ld a,GLOBALFLAG_BEAT_GANON
++	call checkGlobalFlag
++	jr z,@initialize
++	ld a,$01 ; Ordinary Maku Tree floor, replacing the warp as well as the portal.
++	ld c,$67
++	call setTile
++	jp interactionDelete
++
++@initialize:
+ 	ld a,$01
+ 	ld (de),a
+ 	call interactionInitGraphics
+--- a/object_code/seasons/interactions/sokra.s
++++ b/object_code/seasons/interactions/sokra.s
+@@ -10,8 +10,7 @@
+ @state0:
+ 	ld a,$01
+ 	ld (de),a
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,interactionDelete
+ 	ld a,>TX_5200
+ 	call interactionSetHighTextIndex
+--- a/object_code/seasons/interactions/sunkenCityBullies.s
++++ b/object_code/seasons/interactions/sunkenCityBullies.s
+@@ -12,8 +12,7 @@
+ @state0:
+ 	ld a,$01
+ 	ld (de),a
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jp nz,@delete
+ 	ld a,(wDimitriState)
+ 	and $40
+--- a/scripts/ages/scriptHelper.s
++++ b/scripts/ages/scriptHelper.s
+@@ -1260,7 +1260,7 @@
+ 	writeobjectbyte Interaction.var39, $01
+ 	asm15 turnToFaceLink
+ 	wait 8
+-	showtextlowindex <TX_1d21
++	showtextdifferentforlinked TX_1d21, TX_1d23
+ 	wait 8
+ 	setanimation $02
+ 	enableinput
+@@ -1655,8 +1655,7 @@
+ ;;
+ monkey_decideTextIndex:
+ 	ld b,<TX_5708-8
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jr z,+
+ 	ld b,<TX_570d-8
+ +
+@@ -2949,9 +2948,14 @@
+ 	showtextlowindex <TX_0b41
+ 	wait 30
+ 
++	; Finish each native pickup before granting its paired completion ring.
+ 	asm15 giveRingAToLink, SNOWSHOE_RING
++	wait 30
++	checkmemoryeq wLinkForceState, $00
++	asm15 giveRingAToLink, HEART_RING_L1
++	wait 30
++	checkmemoryeq wLinkForceState, $00
+ 	orroomflag $40
+-	wait 30
+ 
+ 	showtextlowindex <TX_0b42
+ 	enableinput
+@@ -4085,8 +4089,7 @@
+ 	jr z,@inPresent
+ 
+ @inPast:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jr nz,@val02
+ 
+ 	ld a,GLOBALFLAG_SAVED_GORON_ELDER
+@@ -4095,8 +4098,7 @@
+ 	jr @val00
+ 
+ @inPresent:
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	call checkGlobalFlag
++	call checkAdventureComplete
+ 	jr nz,@val03
+ 
+ 	ld a,GLOBALFLAG_MOBLINS_KEEP_DESTROYED
+@@ -6433,6 +6435,9 @@
+ ; @param[out]	c	Text index (modified if linked game)
+ makuTree_modifyTextIndexForLinked:
+ 	ld c,a
++	; Completed adventures use the peaceful text without the linked advice offset.
++	call checkAdventureComplete
++	ret nz
+ 	call checkIsLinkedGame
+ 	ret z
+ 	call @getLinkedTextOffset
+@@ -8347,8 +8352,12 @@
+ 	showtext TX_3702
+ 	wait 30
+ 	asm15 giveRingAToLink, SPIN_RING
++	wait 30
++	checkmemoryeq wLinkForceState, $00
++	asm15 giveRingAToLink, SWIMMERS_RING
++	wait 30
++	checkmemoryeq wLinkForceState, $00
+ 	setglobalflag GLOBALFLAG_DONE_PLEN_SECRET
+-	wait 30
+ 	showtext TX_3704
+ 	scriptjump @resume
+ 
+--- a/scripts/ages/scripts.s
++++ b/scripts/ages/scripts.s
+@@ -2529,7 +2529,7 @@
+ 
+ 
+ monkeySubid5Script_bowtieMonkey:
+-	jumpifglobalflagset GLOBALFLAG_FINISHEDGAME, @finishedGame
++	jumpifadventurecomplete @finishedGame
+ 	rungenericnpclowindex <TX_5707
+ @finishedGame:
+ 	rungenericnpclowindex <TX_570c
+--- a/scripts/common/scriptHelper.s
++++ b/scripts/common/scriptHelper.s
+@@ -605,17 +605,25 @@
+ ; INTERAC_GAME_COMPLETE_DIALOG
+ ; ==================================================================================================
+ gameCompleteDialog_markGameAsComplete:
++	; Linked completion records Ganon and peaceful map text. First-adventure
++	; file/world markers and the Maple reset remain specific to Game 1.
++	call checkIsLinkedGame
++	jr z,@firstAdventure
++	ld a,GLOBALFLAG_BEAT_GANON
++	call setGlobalFlag
++	jr @peacefulMapText
++@firstAdventure:
+ 	xor a
+ 	ld (wMapleKillCounter),a
+ 	inc a
+ 	ld (wFileIsCompleted),a
++	ld a,GLOBALFLAG_FINISHEDGAME
++	call setGlobalFlag
++@peacefulMapText:
+ .ifdef ROM_AGES
+-	ld a,<TX_051c
+-	ld (wMakuMapTextPresent),a
+-	ld a,<TX_058c
+-	ld (wMakuMapTextPast),a
++	jp setCompletedMakuMapText
++.else
++	ret
+ .endif
+-	ld a,GLOBALFLAG_FINISHEDGAME
+-	jp setGlobalFlag
+ 
+ .ends
+--- a/scripts/seasons/scripts.s
++++ b/scripts/seasons/scripts.s
+@@ -217,7 +217,7 @@
+ 	scriptjump -
+ 
+ seasonsSpirits_postSeasonGetText:
+-	jumpifglobalflagset GLOBALFLAG_FINISHEDGAME, seasonsSpirits_lastTextGameFinished
++	jumpifadventurecomplete seasonsSpirits_lastTextGameFinished
+ 	jumpifobjectbyteeq $7e, $01, seasonsSpirits_lastTextSaveZeldaText
+ 	jumptable_objectbyte $43
+ 	.dw @spring
+@@ -2438,16 +2438,16 @@
+ 	rungenericnpclowindex <TX_3706
+ 
+ goronScript_text2:
+-	jumpifglobalflagset GLOBALFLAG_FINISHEDGAME, @finishedGame
++	jumpifadventurecomplete @finishedGame
+ 	rungenericnpclowindex <TX_3702
+ @finishedGame:
+ 	rungenericnpclowindex <TX_370e
+ 
+ goronScript_text3_biggoronSick:
+-	jumpifglobalflagset GLOBALFLAG_FINISHEDGAME, goronScript_text3_finishedGame
++	jumpifadventurecomplete goronScript_text3_finishedGame
+ 	rungenericnpclowindex <TX_3703
+ goronScript_text3_biggoronHealed:
+-	jumpifglobalflagset GLOBALFLAG_FINISHEDGAME, goronScript_text3_finishedGame
++	jumpifadventurecomplete goronScript_text3_finishedGame
+ 	rungenericnpclowindex <TX_3707
+ goronScript_text3_finishedGame:
+ 	rungenericnpclowindex <TX_370f
+@@ -6697,7 +6697,7 @@
+ 	writeobjectbyte $78, $01
+ 	asm15 scriptHelp.din_animateAndLookAtLink
+ 	wait 8
+-	showtext TX_3d18
++	showtextdifferentforlinked TX_3d18, TX_3d1a
+ 	enableinput
+ 	writeobjectbyte $78, $00
+ 	setanimation $06
+@@ -7428,7 +7428,7 @@
+ ; ==================================================================================================
+ mayorsHouseGirlScript:
+ 	initcollisions
+-	jumpifglobalflagset GLOBALFLAG_FINISHEDGAME, @finishedGame
++	jumpifadventurecomplete @finishedGame
+ 	settextid TX_3101
+ 	scriptjump @showLoadedText
+ @finishedGame:
+@@ -8025,6 +8025,11 @@
+ 	wait 40
+ 	showtextlowindex <TX_4c39
+ 	asm15 scriptHelp.linkedScript_giveRing, SWIMMERS_RING
++	wait 30
++	checkmemoryeq wLinkForceState, $00
++	asm15 scriptHelp.linkedScript_giveRing, SPIN_RING
++	wait 30
++	checkmemoryeq wLinkForceState, $00
+ 	setcounter1 $02
+ 	setglobalflag GLOBALFLAG_DONE_DIVER_SECRET
+ -
+@@ -8079,6 +8084,10 @@
+ 	wait 30
+ 	asm15 scriptHelp.linkedScript_giveRing, HEART_RING_L1
+ 	wait 30
++	checkmemoryeq wLinkForceState, $00
++	asm15 scriptHelp.linkedScript_giveRing, SNOWSHOE_RING
++	wait 30
++	checkmemoryeq wLinkForceState, $00
+ -
+ 	showtextlowindex <TX_4104
+ 	setglobalflag GLOBALFLAG_DONE_TEMPLE_SECRET
+--- a/seasons.s
++++ b/seasons.s
+@@ -17,6 +17,7 @@
+ 
+ .include {"{BUILD_DIR}/textDefines.s"}
+ 
++.define FIRST_ADVENTURE_HEROS_CAVE_ENTRANCE $04
+ 
+ .BANK $00 SLOT 0
+ .ORG 0
+@@ -89,6 +90,7 @@
+ 		.include {"{GAME_DATA_DIR}/singleTileChanges.s"}
+ 		.include "code/seasons/roomSpecificTileChanges.s"
+ 	.ends
++	.include "data/common/postgameHeartChestGfx.s"
+ 
+ 	; The 2 sections to follow must be in the same bank. (Namespaces only differ because the
+ 	; roomGfxChanges file is in a different bank in Ages.)
+--- a/text/ages/text.yaml
++++ b/text/ages/text.yaml
+@@ -5946,7 +5946,7 @@
+     index: 0x42
+     text: |-
+       Don't forget to
+-      take it to the
++      take them to the
+       jeweler for
+       appraisal!!!
+ 
+@@ -5960,8 +5960,9 @@
+   - name: TX_0b44
+     index: 0x44
+     text: |-
+-      Take that \col(1)ring\col(0)
+-      to the jeweler
++      Take those
++      \col(1)rings\col(0) to the
++      jeweler
+       for appraisal.
+ 
+   - name: TX_0b45
+@@ -9379,6 +9380,25 @@
+       is approaching,
+       just as \col(3)Ralph\col(0)
+       claims...
++
++  - name: TX_1d23
++    index: 0x23
++    text: |-
++      \Link!
++      How are you?
++      Listen to me.
++      After all that's
++      happened, \col(3)Ralph\col(0),
++      like a changed
++      man, has taken
++      up the art of
++      fighting. But I
++      will not let him
++      outdo me!
++      I must fulfill
++      my duties as the
++      Oracle of Ages
++      faithfully.
+ 
+ - group: 0x1e
+   data:
+@@ -18260,8 +18280,8 @@
+     - 0x0e
+     - 0x0f
+     text: |-
+-      Remember--it
+-      needs appraisal.
++      Remember--they
++      need appraisal.
+ 
+   - name: TX_3710
+     index: 0x10
+--- a/text/seasons/text.yaml
++++ b/text/seasons/text.yaml
+@@ -11789,6 +11789,21 @@
+       Just seeing her
+       gives one hope.
+ 
++  - name: TX_3d1a
++    index: 0x1a
++    text: |-
++      \Link!
++      You're safe!\stop
++      Thanks to you,
++      peace has come
++      to the land of
++      \col(3)Holodrum\col(0)!
++      Look! The people
++      are happy!
++      Let us dance
++      together again,
++      \Link!
++
+ - group: 0x3e
+   data:
+   - name: TX_3e00
+@@ -12302,7 +12317,7 @@
+     text: |-
+       Have the jeweler
+       in \col(3)Horon Village\col(0)
+-      appraise it.
++      appraise them.
+ 
+   - name: TX_4105
+     index: 0x05
+@@ -13981,7 +13996,7 @@
+     index: 0x3a
+     text: |-
+       Don't forget to
+-      take it to the
++      take them to the
+       Jeweler in \col(3)Horon
+       Village\col(0)...
+ 
+--- /dev/null
++++ b/data/common/postgameHeartChestGfx.s
+@@ -0,0 +1,15 @@
++; Each row of the outdoor chest mirrors one 8x8 tile.
++.section "Postgame heart chest graphics" SUPERFREE ALIGN 16
++postgameHeartChestGfx:
++.ifdef ROM_AGES
++	.db $ff $ff $80 $ff $a0 $e0 $a0 $e0 $a0 $e0 $a0 $e0 $bf $ff $80 $ff
++.else
++	.db $ff $ff $80 $ff $a0 $e0 $a0 $e0 $a0 $e0 $a0 $e0 $bf $ff $bf $ff
++.endif
++	.db $ff $ff $80 $ff $9e $e1 $9e $e1 $9e $e1 $9e $e1 $9e $e1 $80 $ff
++.ifdef ROM_AGES
++	.db $ff $ff $97 $95 $ff $95 $fd $97 $fc $9f $ff $87 $ff $80 $ff $ff
++.else
++	.db $80 $ff $ff $ff $ff $95 $fd $97 $fc $97 $ff $9f $ff $80 $ff $ff
++.endif
++.ends

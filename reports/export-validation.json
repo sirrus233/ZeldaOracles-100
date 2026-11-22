@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "rom_hashes": {
+    "ages": {
+      "sha1": "ac4eaaf94c9a2288a765fe78e47e0083e314cfbd",
+      "sha256": "1af59896d2c34706dd8a01af9b879dd1e1f09716daf6ce0687549e8a89625546"
+    },
+    "seasons": {
+      "sha1": "8cfe980502f76551e79694bad6c66bc558641712",
+      "sha256": "b5e9b2e3d6fb7fea51ad41f9e176dd2f3469586a6ef9a6f4fa6fd1edf1b05869"
+    }
+  },
+  "source_changes": 60,
+  "clean_public_build_matches": true,
+  "portable_regression_suites": [
+    {
+      "suite": "rites",
+      "exit_code": 0,
+      "seconds": 41.9
+    },
+    {
+      "suite": "world",
+      "exit_code": 0,
+      "seconds": 100.3
+    }
+  ],
+  "rom_free_unit_tests": 6,
+  "no_installed_or_bundled_dependencies": true
+}
