@@ -1,8 +1,18 @@
 # Oracle 100 Percent
 
-Complete Oracle of Ages and Oracle of Seasons with **one playthrough of each
-game, in either order**: start a normal game, then play the other as a linked game.
-Keep both save files; passwords and return visits are still part of the flow.
+Completing Oracle of Ages and Oracle of Seasons with [100% Completion](https://zelda.fandom.com/wiki/100%25_Completion#Oracle_of_Ages_&_Oracle_of_Seasons) is a nightmarish affair that requires 
+two entire playthroughs of each game. The ROM hack in this repository makes various adjustments
+that allow achieving 100% in a single 2-game playthrough, with the games being playable in either
+order. 
+
+Please be warned that "I made" this hack with extensive use of LLMs. I think that a hack like this
+should exist, but do not have any ROM hacking experience myself, and this is well and truly a
+fully vibe-coded project. Bugs may occur. If that happens, please file an issue and I will do
+my best to fix the problem.
+
+My sincerest thanks to [@ShadowOne333](https://github.com/ShadowOne333) who's excellent Zelda hack
+projects inspired this work, [@d0k3's wiki](https://github.com/d0k3/oracles-disasm/wiki/Make-100%25-possible-on-one-linked-playthrough)
+that provided many helpful implementation suggestions, and to [@Stewmath for their work on the Zelda Oracle disassembly](https://github.com/stewmath/oracles-disasm). 
 
 ## Download the patches
 
@@ -12,31 +22,43 @@ Keep both save files; passwords and return visits are still part of the flow.
 Apply each patch directly to its matching **original USA/Australia retail ROM**.
 Do not stack it on an earlier patch. ROMs and emulators are not included.
 See **[patching instructions and required ROM hashes](docs/PLAYING.md)**.
-Players do not need Python, the disassembly, PyBoy or a build toolchain if using
-a BPS-compatible patcher.
 
 GitHub Releases provide both individual patches and a player ZIP with instructions.
-Maintainers publish these automatically by pushing a `v` version tag after local
-validation; see [release instructions](docs/RELEASING.md).
 
-## What changes
+## ROM Hack Changes
 
-- A postgame heart-container chest in Game 1 provides its otherwise missing heart.
-  The normal heart secret remains part of completing both saves.
-- Hero's Cave is available from the start in Game 1. Discover it early, then
-  return as the original equipment puzzles allow, and earn its otherwise missing ring.
-- Ages' otherwise inaccessible sea/map area is reachable when Ages is Game 1.
-- Two of Game 1's original ring quests each award both counterpart rings.
-  Appraise them at Vasu and transfer them with the ordinary ring secret while
-  Game 2 is still in progress. The original ten secret quests and Farore book remain.
-- Game 2 offers a completion save, making the Victory Ring obtainable afterward.
-  Its postgame world uses appropriate peaceful roles while keeping the family,
-  unfinished trades and original linked secret givers available.
-  The Room of Rites entrance closes after this saved final victory.
+### Missing Heart Container
+**Original:** In the first game played, Link caps out at 14 heart containers. A secret carried over
+from a linked game brings this to 15, leaving the second row of hearts incomplete.  
 
-This targets collectible/upgrade completion across both saves. It does not make
-every mutually exclusive story variant occur in both game orders. Advance Shop
-rings retain the games' hardware check; see the player guide.
+**ROMHack:** A heart-container now appears in a chest by the Maku tree in the first game, after the game is completed.
+
+### Hero's Cave Ring
+**Original:** The Hero's Cave is a special dungeon that only appears when playing a Linked game. The Hero's Cave reward
+is different, depending on if your linked game is Ages or Seasons.
+
+**ROMHack:** The Hero's cave is available in both games (even a non-linked game). Since the cave exists in a reduced form
+in a non-linked Oracle of Seasons game, a new entrance is added for the special dungeon (near its vanilla placement).
+
+### Inaccessible Oracle of Ages Map Square
+**Original:** A single square of the map can never be reached in a non-linked Oracle of Ages game.
+
+**ROMHack:** The square is now reachable whether or not Ages is played as a linked game.
+
+### Ring Secret Quests 
+**Original:** A linked game provides 10 secret quests with various rewards. Among these rewards are two rings
+in each game (a total of four) that cannot be obtained in the other game.
+
+**ROMHack:** A secret quest that would award one of these rings, now awards both.  
+* Note: This does mean that, depending on your order of play, you will only ever seen 10 of the 20 possible secret quests.
+
+### Victory Ring
+**Original:** The Victory Ring is a special ring that can only be obtained after defeating Ganon in a linked game, and then
+starting a fresh playthrough with the Hero's Secret password.
+
+**ROMHack:** Completing a linked game now offers a completion save (just like a non-linked game does), allowing for
+post-game play. During the post-game of a linked game, the world uses appropriate "peaceful" dialogue, and the Victory
+Ring can be claimed by visiting Vasu.
 
 ## Source and development
 
